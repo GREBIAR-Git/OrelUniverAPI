@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Net;
 using System.Text;
 
 namespace OrelUniverEmbeddedAPI;
@@ -15,8 +14,16 @@ public class OrelUniverAPI
 
     public class Result<T>
     {
-        public int code;
-        public List<T>? response;
+        public int Code { get; set; }
+        public List<T>? Response { get; set; }
+        public Result(int code)
+        {
+            Code = code;
+        }
+        public Result()
+        {
+            Code = 1;
+        }
     }
 
     static Result<T>? Request<T>(string pathMethod, string? parameters = null)
@@ -30,17 +37,23 @@ public class OrelUniverAPI
         {
             httpRequestMessage.Content = new StringContent(parameters, Encoding.UTF8, contentType);
         }
-
-        using HttpResponseMessage httpResponse = client.Send(httpRequestMessage);
-        using Stream sr = httpResponse.Content.ReadAsStream();
-        byte[] bytes = new byte[sr.Length];
-        if (sr.Read(bytes) > 0)
+        try
         {
-            string? content = Encoding.UTF8.GetString(bytes);
-            if (content != null)
+            using HttpResponseMessage httpResponse = client.Send(httpRequestMessage);
+            using Stream sr = httpResponse.Content.ReadAsStream();
+            byte[] bytes = new byte[sr.Length];
+            if (sr.Read(bytes) > 0)
             {
-                return JsonConvert.DeserializeObject<Result<T>>(content);
+                string? content = Encoding.UTF8.GetString(bytes);
+                if (content != null)
+                {
+                    return JsonConvert.DeserializeObject<Result<T>>(content);
+                }
             }
+        }
+        catch
+        {
+            return new Result<T>();
         }
         return null;
     }
@@ -185,16 +198,16 @@ public class OrelUniverAPI
         return RequestAsync<Division>("schedule.getDivisionsForStudents");
     }
 
-    public static Result<Cabinet>? ScheduleGetCabinets(string building)
+    public static Result<Cabinets>? ScheduleGetCabinets(string building)
     {
         string parameters = "building=" + building;
-        return Request<Cabinet>("schedule.getCabinets", parameters);
+        return Request<Cabinets>("schedule.getCabinets", parameters);
     }
 
-    public static Task<Result<Cabinet>?> ScheduleGetCabinetsAsync(string building)
+    public static Task<Result<Cabinets>?> ScheduleGetCabinetsAsync(string building)
     {
         string parameters = "building=" + building;
-        return RequestAsync<Cabinet>("schedule.getCabinets", parameters);
+        return RequestAsync<Cabinets>("schedule.getCabinets", parameters);
     }
 
     public static Result<Cours>? ScheduleGetCourse(string division)

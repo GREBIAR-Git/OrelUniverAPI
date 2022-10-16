@@ -9,7 +9,7 @@
     <Title></Title>
     <PackageIcon>icon.jpeg</PackageIcon>
     <RepositoryUrl>https://github.com/GREBIAR-Git/OrelUniverAPI</RepositoryUrl>
-    <Version>1.0.3</Version>
+    <Version>1.0.4.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
